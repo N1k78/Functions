@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+
+import sys
+
+file_system=[
+{
+    "name" : "/",
+    "type" : "directory",
+    "children" : [
+        {
+            "name" : "home",
+            "type" : "directory",
+            "children" : [
+                {
+                    "name" : "admin",
+                    "type" : "directory",
+                    "children" : [
+                    {
+                        "name" : "Desktop",
+                        "type" : "directory",
+                        "children" : [
+                            
+                        ]
+                    },
+                    {
+                        "name" : "Documents",
+                        "type" : "directory",
+                        "children" : [
+                            
+                        ]
+                    },
+                    {
+                        "name" : "Music",
+                        "type" : "directory",
+                        "children" : [
+                            
+                        ]
+                    },
+                    {
+                        "name" : "Pictures",
+                        "type" : "directory",
+                        "children" : [
+                            
+                        ]
+                    },
+                    {
+                        "name" : "Public",
+                        "type" : "directory",
+                        "children" : [
+                            
+                        ]
+                    },
+                    {
+                        "name" : "Videos",
+                        "type" : "directory",
+                        "children" : [
+                            
+                        ]
+                    } 
+                    ]
+                } 
+            ]
+        }
+    ]
+}
+]
+
+class PyOSShell:
+    def __init__(self):
+        self.path = "/home/admin"
+        self.commands = {
+            "exit": self.exit,
+            "ls" : self.ls
+        }
+    
+    def ls(self, args):
+    # Определяем путь
+        if args:
+            path = args[0]
+            if not path.startswith("/"):
+                if self.path == "/":
+                    path = "/" + path
+                else:
+                    path = self.path + "/" + path
+        else:
+            path = self.path
+        
+        # Убираем лишние слеши
+        while "//" in path:
+            path = path.replace("//", "/")
+        if path.endswith("/") and path != "/":
+            path = path[:-1]
+        
+        # Начинаем с корня
+        current = file_system[0]
+        
+        # Разбиваем путь
+        if path == "/":
+            parts = []
+        else:
+            parts = [p for p in path.split("/") if p]
+        
+        # Идём по пути
+        for part in parts:
+            found = False
+            for child in current.get("children", []):
+                if child.get("name") == part and child.get("type") == "directory":
+                    current = child
+                    found = True
+                    break
+            if not found:
+                print(f"ls: {path}: No such directory")
+                return
+        
+        # Выводим содержимое
+        children = current.get("children", [])
+        if not children:
+            return
+        
+        for child in children:
+            name = child.get("name")
+            if child.get("type") == "directory":
+                print(f"\033[94m{name}/\033[0m")
+            else:
+                print(name)
+                
+    def exit(self, args):
+        sys.exit(0)
+    
+    def execute(self, line):
+        line = line.strip()
+        if not line:
+            return
+        
+        parts = line.split()
+        cmd = parts[0]
+        args = parts[1:]
+        
+        if cmd in self.commands:
+            self.commands[cmd](args)
+        else:
+            print(f"pyshell: command '{cmd}' not found")
+    
+    def run(self):
+        while True:
+            try:
+
+                self.execute(input("> "))
+            except KeyboardInterrupt:
+                print()
+                # Ctrl+C - ничего не выводим, просто продолжаем
+                continue
+            except EOFError:
+                print()
+                break
+
+if __name__ == "__main__":
+    PyOSShell().run()

@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # Меню (один раз пишем, потом вставляем в каждую страницу)
 menu_width= str(75)+"px"
-menu_padding= str(10)+"px"
+menu_padding= str(5)+"px"
 # fon_color= "#F5F5F5"
 fon_color= "#E8F5E9" # E8F5E9 - класс - не менять !!!!
 menu_color= "#3CB371" # 4/10 3CB371
@@ -25,8 +25,10 @@ def set_link(
 
 menu = f"""
 <div style="float:left; width:{menu_width}; background:{menu_color}; padding:{menu_padding};">
+    Site menu:
     {set_link("Main page","http://127.0.0.1:8000/")}
-    {set_link("Test","http://127.0.0.1:8000/test")}
+    {set_link("Test page","http://127.0.0.1:8000/test")}
+    {set_link("About","http://127.0.0.1:8000/about")}
 </div>
 """
 # Когда открываешь главную страницу "/", будет выполняться эта функция
@@ -49,7 +51,8 @@ def home():
     </head>
     <body style="background-color:{fon_color};">
         {menu}
-        <h1>Hello World 1</h1>
+        <h1>My main page.</h1>
+        <p> I wants to create somfing unusial</p>
     </body>
     </html>
     """
@@ -68,10 +71,26 @@ def home_test():
     <body style="background-color:{fon_color};">
         {menu}
         <h1>Hello world</h1>
-        <p> Это обычный текст на странице.</p>
+        <p> This page is for testing new ideas.</p>
     </body>
     </html>
-    """
+"""
+
+@app.route("/about")
+def about():
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>About page</title>
+    </head>
+    <body style="background-color:{fon_color};">
+        {menu}
+        <h1>Abote</h1>
+        <p> Here will be ifnormation:</p>
+    </body>
+    </html>
+"""
 
 # Запускаем сайт
 if __name__ == "__main__":
