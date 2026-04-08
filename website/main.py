@@ -1,5 +1,7 @@
-from flask import Flask
+from flask import Flask, render_template
 
+ip_adrr = "127.0.0.1"
+ip_port = 8000
 # Создаём приложение (сайт)
 app = Flask(__name__)
 
@@ -43,19 +45,10 @@ def home():
     # <head> # начяло "заголовок"
     # </head> # конец "заголовок"
     # </html> # конец html
-    return f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Main page</title>
-    </head>
-    <body style="background-color:{fon_color};">
-        {menu}
-        <h1>My main page.</h1>
-        <p> I wants to create somfing unusial</p>
-    </body>
-    </html>
-    """
+    with open("website/html/mainpage.html", "r", encoding="utf-8") as file:
+        html_content = file.read()
+    print(html_content)
+    return html_content
     # return "Hello world 2"
 
 @app.route("/test")
@@ -94,4 +87,4 @@ def about():
 
 # Запускаем сайт
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8000)
+    app.run(host=ip_adrr, port=ip_port)
