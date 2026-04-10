@@ -3,68 +3,77 @@
 import sys
 import json
 
-file_system=[
+file_system={
+"/":
 {
     "name" : "/",
     "type" : "directory",
-    "children" : [
-        {
+    "children" : {
+            "home":
+            {
             "name" : "home",
             "type" : "directory",
-            "children" : [
+            "children" : {
+                "admin":
                 {
                     "name" : "admin",
                     "type" : "directory",
-                    "children" : [
+                    "children" : {
+                "Desktop":
                     {
                         "name" : "Desktop",
                         "type" : "directory",
-                        "children" : [
+                        "children" : {
                             
-                        ]
+                        }
                     },
+                "Documents":
                     {
                         "name" : "Documents",
                         "type" : "directory",
-                        "children" : [
+                        "children" : {
                             
-                        ]
+                        }
                     },
+                "Music":
                     {
                         "name" : "Music",
                         "type" : "directory",
-                        "children" : [
+                        "children" : {
                             
-                        ]
+                        }
                     },
+                "Pictures":
                     {
                         "name" : "Pictures",
                         "type" : "directory",
-                        "children" : [
+                        "children" : {
                             
-                        ]
+                        }
                     },
+                "Public":
                     {
                         "name" : "Public",
                         "type" : "directory",
-                        "children" : [
+                        "children" : {
                             
-                        ]
+                        }
                     },
+                "Videos":
                     {
                         "name" : "Videos",
                         "type" : "directory",
-                        "children" : [
+                        "children" : {
                             
-                        ]
+                        }
                     } 
-                    ]
+                    }
                 } 
-            ]
+            }
         }
-    ]
+    }
 }
-]
+}
 
 
 class PyOSShell:
@@ -78,7 +87,6 @@ class PyOSShell:
         }
 
     def make_absolute(self, target: str) -> str:
-        """Самая простая версия: текущий путь + то, что ввёл пользователь"""
         if not target:
             return self.path
 
@@ -104,7 +112,7 @@ class PyOSShell:
 
     def cd(self, args):
         if args:
-            self.path = args[0]
+            self.path = self.make_absolute(args[0])
         else:
             self.path = self.make_absolute("~")
         pass
@@ -113,12 +121,84 @@ class PyOSShell:
         print(self.path)
         return
     
-    def get_rigth_child(self,folder,name):
-        return folder["children"]
+    def get_directory(self, path: str):
+        """Возвращает узел файловой системы по абсолютному пути"""
+        if path == "/":
+            return file_system["/"]
 
+        parts = [p for p in path.split("/") if p]
+        current = file_system["/"]
+
+        for part in parts:
+            if current.get("type") != "directory":
+                return None
+            children = current.get("children", {})
+            if part not in children:
+                return None
+            current = children[part]
+
+        return current
+    
     def ls(self, args):
-        
-        pass
+        show_all = False      # -a
+        long_format = False   # -l
+        target = "."
+
+        # Парсинг аргументов
+        i = 0
+        while i < len(args):
+            arg = args[i]
+            if arg.startswith("-") and arg != "-":
+                for char in arg[1:]:
+                    if char == "a":
+                        show_all = True
+                    elif char == "l":
+                        long_format = True
+                    else:
+                        print(f"ls: invalid option -- '{char}'")
+                        return
+            else:
+                target = arg
+            i += 1
+
+        abs_path = self.make_absolute(target)
+        node = self.get_directory(abs_path)
+
+        if node is None:
+            print(f"ls: cannot access '{target}': No such file or directory")
+            return
+
+        # Если это файл, а не директория
+        if node["type"] != "directory":
+            print(node["name"])
+            return
+
+        # Получаем содержимое
+        children = node.get("children", {})
+
+        # Формируем список элементов
+        items = []
+        for name, item in children.items():
+            if not show_all and name.startswith("."):
+                continue
+            items.append((name, item))
+
+        # Сортируем по имени
+        items.sort(key=lambda x: x[0])
+
+        if not items:
+            return
+
+        # Вывод
+        if long_format:
+            for name, item in items:
+                item_type = "d" if item["type"] == "directory" else "-"
+                # Простая имитация прав и размера
+                print(f"{item_type}rw-r--r-- 1 admin admin  4096 Apr 10 12:00 {name}")
+        else:
+            # Обычный вывод в одну строку
+            names = [name for name, _ in items]
+            print("  ".join(names))
 
     def exit(self, args):
         sys.exit(0)
