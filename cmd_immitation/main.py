@@ -8,11 +8,13 @@ file_system={
 {
     "name" : "/",
     "type" : "directory",
+    "permition" : "drw-r--r--",
     "children" : {
             "home":
             {
             "name" : "home",
             "type" : "directory",
+            "permition" : "drw-r--r--",
             "children" : {
                 "admin":
                 {
@@ -21,6 +23,7 @@ file_system={
                     "children" : {
                 "Desktop":
                     {
+                        "permition" : "drw-r--r--",
                         "name" : "Desktop",
                         "type" : "directory",
                         "children" : {
@@ -29,6 +32,7 @@ file_system={
                     },
                 "Documents":
                     {
+                        "permition" : "drw-r--r--",
                         "name" : "Documents",
                         "type" : "directory",
                         "children" : {
@@ -37,6 +41,7 @@ file_system={
                     },
                 "Music":
                     {
+                        "permition" : "drw-r--r--",
                         "name" : "Music",
                         "type" : "directory",
                         "children" : {
@@ -45,6 +50,7 @@ file_system={
                     },
                 "Pictures":
                     {
+                        "permition" : "drw-r--r--",
                         "name" : "Pictures",
                         "type" : "directory",
                         "children" : {
@@ -53,6 +59,7 @@ file_system={
                     },
                 "Public":
                     {
+                        "permition" : "drw-r--r--",
                         "name" : "Public",
                         "type" : "directory",
                         "children" : {
@@ -61,6 +68,7 @@ file_system={
                     },
                 "Videos":
                     {
+                        "permition" : "drw-r--r--",
                         "name" : "Videos",
                         "type" : "directory",
                         "children" : {
@@ -84,7 +92,16 @@ class PyOSShell:
             "ls": self.ls,
             "cd": self.cd,
             "pwd": self.pwd,
+            "sudo" : self.sudo
         }
+
+    def sudo(self,args):
+        
+        pass
+
+    def refresh_aliases():
+        
+        pass
 
     def make_absolute(self, target: str) -> str:
         if not target:
@@ -118,9 +135,12 @@ class PyOSShell:
         pass
 
     def pwd(self,args):
-        print(self.path)
+        if len(args) == 0:
+            print(self.path)
+        else:
+            print(f"pwd: to many arguments.")
         return
-    
+
     def get_directory(self, path: str):
         """Возвращает узел файловой системы по абсолютному пути"""
         if path == "/":
