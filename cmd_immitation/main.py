@@ -9,23 +9,28 @@ file_system={
     "name" : "/",
     "type" : "directory",
     "permition" : "drw-r--r--",
+    "hide" : False, 
     "children" : {
             "home":
             {
             "name" : "home",
             "type" : "directory",
             "permition" : "drw-r--r--",
+            "hide" : False, 
             "children" : {
                 "admin":
                 {
+                    "permition" : "drw-r--r--",
                     "name" : "admin",
                     "type" : "directory",
+                    "hide" : False, 
                     "children" : {
                 "Desktop":
                     {
                         "permition" : "drw-r--r--",
                         "name" : "Desktop",
                         "type" : "directory",
+                        "hide" : False, 
                         "children" : {
                             
                         }
@@ -33,6 +38,7 @@ file_system={
                 "Documents":
                     {
                         "permition" : "drw-r--r--",
+                        "hide" : False, 
                         "name" : "Documents",
                         "type" : "directory",
                         "children" : {
@@ -42,6 +48,7 @@ file_system={
                 "Music":
                     {
                         "permition" : "drw-r--r--",
+                        "hide" : False, 
                         "name" : "Music",
                         "type" : "directory",
                         "children" : {
@@ -51,6 +58,7 @@ file_system={
                 "Pictures":
                     {
                         "permition" : "drw-r--r--",
+                        "hide" : False, 
                         "name" : "Pictures",
                         "type" : "directory",
                         "children" : {
@@ -60,6 +68,7 @@ file_system={
                 "Public":
                     {
                         "permition" : "drw-r--r--",
+                        "hide" : False, 
                         "name" : "Public",
                         "type" : "directory",
                         "children" : {
@@ -69,6 +78,7 @@ file_system={
                 "Videos":
                     {
                         "permition" : "drw-r--r--",
+                        "hide" : False, 
                         "name" : "Videos",
                         "type" : "directory",
                         "children" : {
@@ -78,7 +88,13 @@ file_system={
                     }
                 } 
             }
-        }
+        },
+            ".config":{
+                "name" : "Videos",
+                "type" : "file",
+                "permition" : "drw-r--r--",
+                "hide" : True, 
+            },
     }
 }
 }
@@ -199,7 +215,7 @@ class PyOSShell:
         # Формируем список элементов
         items = []
         for name, item in children.items():
-            if not show_all and name.startswith("."):
+            if not show_all and item.get("hide", False):
                 continue
             items.append((name, item))
 
