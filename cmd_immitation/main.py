@@ -110,9 +110,24 @@ class PyOSShell:
             "pwd": self.pwd,
             "sudo" : self.sudo
         }
+        self.command_run_sudo ={
+            
+        }
+        self.password = "12345"
 
     def sudo(self,args):
-        
+        if len(args) == 0:
+            print("sudo: no command provided")
+            return
+        elif args[0].startswith("-") and args[0].split("-")[1] == "v":
+            password = input("[sudo] password for admin: ")
+            if password == self.password:
+                pass
+            else:
+                print("Sorry, try again.")
+        else:
+            print(f"sudo: invalid option -- '{args[0]}'")
+            return
         pass
 
     def refresh_aliases():
@@ -239,7 +254,7 @@ class PyOSShell:
     def exit(self, args):
         sys.exit(0)
     
-    def execute(self, line):
+    def execute(self, line, run_absolute=False):
         line = line.strip()
         if not line:
             return
