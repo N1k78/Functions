@@ -1,7 +1,19 @@
 #!/usr/bin/env python3
 
 import sys
-import json
+
+class color:
+    def __init__(self):
+        self.YELLOW = '\033[93m'
+        self.MAGENTA = '\033[95m'
+        self.CYAN = '\033[96m'
+        self.RED_1 = '\033[91m'
+        self.RED_2 =  '\033[31m'
+        self.BLUE = '\033[94m'
+        self.BLUE_2 = '\033[34m'
+        self.GREEN = '\033[92m'
+        self.GREEN_2 = '\033[32m'
+        self.END = '\033[0m'
 
 file_system={
 "/":
@@ -102,6 +114,7 @@ file_system={
 
 class PyOSShell:
     def __init__(self):
+        self.color = color()
         self.path = "/home/admin"
         self.commands = {
             "exit": self.exit,
@@ -110,28 +123,26 @@ class PyOSShell:
             "pwd": self.pwd,
             "sudo" : self.sudo
         }
-        self.command_run_sudo ={
-            
-        }
+        self.sudo_admin=False
         self.password = "12345"
 
     def sudo(self,args):
         if len(args) == 0:
             print("sudo: no command provided")
             return
-        elif args[0].startswith("-") and args[0].split("-")[1] == "v":
-            password = input("[sudo] password for admin: ")
-            if password == self.password:
-                pass
+        elif args[0].startswith("-") and args[0].split("-")[1] == "s":
+            for _ in range(3):
+                password = input("[sudo] password for admin: ")
+                if password == self.password:
+                    self.sudo_admin = True
+                    break
+                else:
+                    print("Sorry, try again.")
             else:
-                print("Sorry, try again.")
+                return
         else:
             print(f"sudo: invalid option -- '{args[0]}'")
             return
-        pass
-
-    def refresh_aliases():
-        
         pass
 
     def make_absolute(self, target: str) -> str:
@@ -252,32 +263,55 @@ class PyOSShell:
             print("  ".join(names))
 
     def exit(self, args):
-        sys.exit(0)
-    
-    def execute(self, line, run_absolute=False):
-        line = line.strip()
-        if not line:
-            return
-        
-        parts = line.split()
-        cmd = parts[0]
-        args = parts[1:]
-        
-        if cmd in self.commands:
-            self.commands[cmd](args)
+        if self.sudo_admin:
+            self.sudo_admin = False
         else:
-            print(f"pyshell: command '{cmd}' not found")
+            sys.exit(0)
+    
+    def execute(self, all_line):
+        for line in all_line.split(";"):
+            line = line.strip()
+            if not line:
+                return
+            
+            parts = line.split()
+            cmd = parts[0]
+            args = parts[1:]
+            
+            if cmd in self.commands:
+                self.commands[cmd](args)
+            else:
+                print(f"{self.color.RED_2}pyshell: command '{cmd}' not found")
     
     def run(self):
+        print(f"Welcome to PyOS Shell!")
+        print(f"Type 'help' to see available commands.")
         while True:
             try:
-                self.execute(input(f"{self.path}> "))
+                if self.sudo_admin:
+                    prompt = f"root@local "
+                else:
+                    prompt = f"admin@local "
+                for directory in self.path.replace("/home/admin", "~").split("/"):
+                    if not directory:
+                        continue
+                    # print(self.path.split("/"))
+                    # print(directory[0])
+                    if directory[0] == "~":
+                        prompt += f"{directory[0]}"
+                    elif self.path.replace("/home/admin", "~").split("/")[-1] == directory:
+                        prompt += f"/{directory}"
+                    else:
+                        prompt += f"/{directory[0]}"
+                prompt += "> "
+                command = input(prompt)
+                self.execute(command)
             except KeyboardInterrupt:
                 print()
                 continue
             except EOFError:
                 print()
-                break
+                self.exit([])
 
 
 
